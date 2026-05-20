@@ -291,35 +291,41 @@ export default function PtSessionsTab({ navigation }: Props) {
       {/* Main List Filters */}
       <View style={{ paddingHorizontal: 24, paddingTop: 16, gap: 12 }}>
         <Text style={styles.sectionTitle}>FILTER BY STATUS</Text>
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-          {["all", "booked", "complete", "cancelled", "no_show"].map((status) => (
-            <TouchableOpacity
-              key={status}
-              style={[
-                {
-                  paddingHorizontal: 12,
-                  paddingVertical: 8,
-                  borderRadius: 10,
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
-                  borderWidth: 1,
-                  borderColor: "rgba(255, 255, 255, 0.08)",
-                },
-                statusFilter === status && {
-                  backgroundColor: "rgba(255, 94, 58, 0.12)",
-                  borderColor: "#FF5E3A",
-                }
-              ]}
-              onPress={() => setStatusFilter(status as any)}
-            >
-              <Text style={{
-                fontSize: 11,
-                fontWeight: "800",
-                color: statusFilter === status ? "#FF5E3A" : "rgba(255, 255, 255, 0.6)",
-              }}>
-                {status}
-              </Text>
-            </TouchableOpacity>
-          ))}
+        <View style={{ flexDirection: "row", gap: 8 }}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 8, alignItems: "center" }}
+          >
+            {(["all", "booked", "complete", "cancelled", "no_show"] as const).map((status) => (
+              <TouchableOpacity
+                key={status}
+                style={[
+                  {
+                    paddingHorizontal: 12,
+                    paddingVertical: 8,
+                    borderRadius: 10,
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    borderWidth: 1,
+                    borderColor: "rgba(255, 255, 255, 0.08)",
+                  },
+                  statusFilter === status && {
+                    backgroundColor: "rgba(255, 94, 58, 0.12)",
+                    borderColor: "#FF5E3A",
+                  }
+                ]}
+                onPress={() => setStatusFilter(status)}
+              >
+                <Text style={{
+                  fontSize: 11,
+                  fontWeight: "800",
+                  color: statusFilter === status ? "#FF5E3A" : "rgba(255, 255, 255, 0.6)",
+                }}>
+                  {status}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
 
         {/* Date Filter Selection card */}

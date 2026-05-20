@@ -4,5 +4,11 @@ export type RootStackParamList = {
   Register: undefined;
   TrainerHome: undefined;
   ReceptionTabs: undefined;
-  AdminHome: undefined;
+};
+
+export type ReceptionTabParamList = {
+  Dashboard: undefined;
+  Members: undefined;
+  "Pt-sessions": undefined;
+  Attendance: undefined;
 };

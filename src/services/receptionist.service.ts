@@ -2,29 +2,6 @@ import API from "./api";
 import { AxiosResponse } from "axios";
 
 // --- Types ---
-export interface DailySummary {
-  total_checkins: number;
-  total_pt_sessions: number;
-  new_memberships: number;
-  renewals: number;
-  membership_revenue: number;
-  pt_revenue: number;
-  total_revenue: number;
-  peak_hour: number | null;
-}
-
-export interface MembershipExpiry {
-  member_code: string;
-  name: string;
-  phone: string;
-  plan_name: string;
-  start_date: string;
-  end_date: string;
-  days_remaining: number;
-  remaining_pt_sessions: number;
-  expiry_status: "EXPIRED" | "EXPIRING_SOON" | "ACTIVE";
-}
-
 export interface Member {
   id: number;
   member_code: string;
@@ -112,27 +89,6 @@ const unwrap = <T>(res: AxiosResponse<NestResponseWrapper<T> | T>): T => {
 };
 
 // --- Receptionist Endpoints ---
-export const getDailySummary = async (date: string): Promise<DailySummary> => {
-  const res = await API.get<NestResponseWrapper<DailySummary[]> | DailySummary[]>(`/reports/daily-summary?date=${date}`);
-  const data = unwrap<DailySummary[]>(res);
-  return (Array.isArray(data) ? data[0] : data) || {
-    total_checkins: 0,
-    total_pt_sessions: 0,
-    new_memberships: 0,
-    renewals: 0,
-    membership_revenue: 0,
-    pt_revenue: 0,
-    total_revenue: 0,
-    peak_hour: null,
-  };
-};
-
-export const getMembershipExpiry = async (): Promise<MembershipExpiry[]> => {
-  const res = await API.get<NestResponseWrapper<MembershipExpiry[]> | MembershipExpiry[]>("/reports/membership-expiry");
-  const data = unwrap<MembershipExpiry[]>(res);
-  return Array.isArray(data) ? data : [];
-};
-
 export const getMembers = async (search?: string, status?: string, planId?: number): Promise<Member[]> => {
   let url = "/members?limit=100";
   if (status && status !== "ALL") {
@@ -143,7 +99,7 @@ export const getMembers = async (search?: string, status?: string, planId?: numb
   }
   const res = await API.get<NestResponseWrapper<PaginatedMembers> | PaginatedMembers>(url);
   const data = unwrap<PaginatedMembers>(res);
-  
+
   let list = data?.members;
   if (!Array.isArray(list)) {
     const fallback = data as unknown as Member[];
@@ -289,15 +245,15 @@ export const getAllPtSessions = async (status?: string, date?: string, page = 1,
   }
   const res = await API.get<NestResponseWrapper<PaginatedSessionsResponse> | PaginatedSessionsResponse | MemberPtSession[]>(url);
   const data = unwrap<PaginatedSessionsResponse | MemberPtSession[]>(res);
-  
+
   if (Array.isArray(data)) {
     return data;
   }
-  
+
   if (data && typeof data === "object" && 'sessions' in data && Array.isArray(data.sessions)) {
     return data.sessions;
   }
-  
+
   return [];
 };
 

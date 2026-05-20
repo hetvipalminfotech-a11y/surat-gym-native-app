@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -9,42 +9,22 @@ import {
   StatusBar,
   Alert,
   Platform,
-  ActivityIndicator,
 } from "react-native";
 import { getUser, clearStorage } from "../../storage/mmkv";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { CompositeNavigationProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../navigation/types";
-import { getDailySummary, getMembershipExpiry, DailySummary, MembershipExpiry } from "../../services/receptionist.service";
+import { RootStackParamList, ReceptionTabParamList } from "../../navigation/types";
 
 type Props = {
-  navigation: NativeStackNavigationProp<RootStackParamList, "ReceptionTabs">;
+  navigation: CompositeNavigationProp<
+    BottomTabNavigationProp<ReceptionTabParamList, "Dashboard">,
+    NativeStackNavigationProp<RootStackParamList>
+  >;
 };
 
 export default function DashboardTab({ navigation }: Props) {
   const user = getUser();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [summary, setSummary] = useState<DailySummary | null>(null);
-  const [expiringList, setExpiringList] = useState<MembershipExpiry[]>([]);
-
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-      const summaryData = await getDailySummary(today);
-      const expiryData = await getMembershipExpiry();
-
-      setSummary(summaryData);
-      setExpiringList(expiryData);
-    } catch (err) {
-      console.warn("Failed to fetch reports:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
 
   const handleLogout = () => {
     Alert.alert("Confirm Logout", "Are you sure you want to log out?", [
@@ -59,12 +39,22 @@ export default function DashboardTab({ navigation }: Props) {
     ]);
   };
 
-  const expiringCount = Array.isArray(expiringList)
-    ? expiringList.filter(item => item?.expiry_status === "EXPIRING_SOON").length
-    : 0;
-  const expiredCount = Array.isArray(expiringList)
-    ? expiringList.filter(item => item?.expiry_status === "EXPIRED").length
-    : 0;
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning ☀️";
+    if (hour < 17) return "Good Afternoon 🌤️";
+    return "Good Evening 🌙";
+  };
+
+  const getFormattedDate = () => {
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: "long",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    };
+    return new Date().toLocaleDateString("en-US", options);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -82,67 +72,88 @@ export default function DashboardTab({ navigation }: Props) {
         </TouchableOpacity>
       </View>
 
-      {loading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF5E3A" />
-          <Text style={styles.loadingText}>Fetching backend statistics...</Text>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+
+        {/* Greeting Banner */}
+        <View style={styles.greetingBanner}>
+          <View style={styles.accentBar} />
+          <Text style={styles.greetingSub}>{getGreeting()}</Text>
+          <Text style={styles.greetingTitle}>Hello, {user?.name || "Receptionist"}!</Text>
+          <Text style={styles.greetingText}>
+            Ready to shape a premium gym experience? Check in members, manage personal training slots, and track active memberships below.
+          </Text>
         </View>
-      ) : (
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-          {/* Banner */}
-          <View style={styles.banner}>
-            <Text style={styles.bannerTitle}>Surat Gym Hub 🏋️‍♂️</Text>
-            <Text style={styles.bannerSubtitle}>Native Receptionist Control Panel</Text>
-          </View>
 
-          {/* Stats Grid */}
-          <Text style={styles.sectionTitle}>TODAY'S OVERVIEW</Text>
-          <View style={styles.statsGrid}>
-            <View style={styles.statCard}>
-              <Text style={styles.statEmoji}>👥</Text>
-              <Text style={styles.statNumber}>{summary?.new_memberships || 0}</Text>
-              <Text style={styles.statLabel}>New Memberships</Text>
+        {/* Shift Details Card */}
+        <View style={styles.shiftCard}>
+          <View style={styles.shiftRow}>
+            <View>
+              <Text style={styles.shiftLabel}>TODAY'S DATE</Text>
+              <Text style={styles.shiftValue}>{getFormattedDate()}</Text>
             </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statEmoji}>🔄</Text>
-              <Text style={styles.statNumber}>{summary?.renewals || 0}</Text>
-              <Text style={styles.statLabel}>Renewals Today</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statEmoji}>✅</Text>
-              <Text style={styles.statNumber}>{summary?.total_checkins || 0}</Text>
-              <Text style={styles.statLabel}>Check-Ins Today</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statEmoji}>🗓️</Text>
-              <Text style={styles.statNumber}>{summary?.total_pt_sessions || 0}</Text>
-              <Text style={styles.statLabel}>PT Sessions Booked</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statEmoji}>💳</Text>
-              <Text style={styles.statNumber}>₹{summary?.membership_revenue || 0}</Text>
-              <Text style={styles.statLabel}>Membership Revenue</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statEmoji}>🏋️</Text>
-              <Text style={styles.statNumber}>₹{summary?.pt_revenue || 0}</Text>
-              <Text style={styles.statLabel}>PT Session Revenue</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statEmoji}>💰</Text>
-              <Text style={styles.statNumber}>₹{summary?.total_revenue || 0}</Text>
-              <Text style={styles.statLabel}>Total Revenue</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statEmoji}>⚡</Text>
-              <Text style={styles.statNumber}>{summary?.peak_hour !== null && summary?.peak_hour !== undefined ? `${summary.peak_hour}:00` : "N/A"}</Text>
-              <Text style={styles.statLabel}>Peak Attendance Hour</Text>
+            <View style={styles.divider} />
+            <View>
+              <Text style={styles.shiftLabel}>SHIFT STATUS</Text>
+              <View style={styles.statusRow}>
+                <View style={styles.activeDot} />
+                <Text style={styles.shiftValueActive}>ACTIVE</Text>
+              </View>
             </View>
           </View>
+        </View>
 
+        {/* Quick Shortcuts */}
+        <Text style={styles.sectionTitle}>QUICK SYSTEM SHORTCUTS</Text>
+        <View style={styles.shortcutsContainer}>
 
-        </ScrollView>
-      )}
+          <TouchableOpacity
+            style={[styles.shortcutCard, styles.shortcutGreen]}
+            onPress={() => navigation.navigate("Attendance")}
+            activeOpacity={0.8}
+          >
+            <View style={styles.shortcutHeader}>
+              <Text style={styles.shortcutIcon}>📝</Text>
+              <Text style={styles.shortcutTitleGreen}>ATTENDANCE</Text>
+            </View>
+            <Text style={styles.shortcutDesc}>Record real-time member check-ins and check-out logs.</Text>
+            <View style={styles.shortcutArrowContainer}>
+              <Text style={styles.shortcutArrowGreen}>GO TO PANEL ➜</Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.shortcutCard, styles.shortcutOrange]}
+            onPress={() => navigation.navigate("Members")}
+            activeOpacity={0.8}
+          >
+            <View style={styles.shortcutHeader}>
+              <Text style={styles.shortcutIcon}>👥</Text>
+              <Text style={styles.shortcutTitleOrange}>MEMBERS</Text>
+            </View>
+            <Text style={styles.shortcutDesc}>Register new members, renew plans, and manage status.</Text>
+            <View style={styles.shortcutArrowContainer}>
+              <Text style={styles.shortcutArrowOrange}>GO TO PANEL ➜</Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.shortcutCard, styles.shortcutPurple]}
+            onPress={() => navigation.navigate("Pt-sessions")}
+            activeOpacity={0.8}
+          >
+            <View style={styles.shortcutHeader}>
+              <Text style={styles.shortcutIcon}>🗓️</Text>
+              <Text style={styles.shortcutTitlePurple}>PT SESSIONS</Text>
+            </View>
+            <Text style={styles.shortcutDesc}>Schedule and coordinate trainer personal sessions.</Text>
+            <View style={styles.shortcutArrowContainer}>
+              <Text style={styles.shortcutArrowPurple}>GO TO PANEL ➜</Text>
+            </View>
+          </TouchableOpacity>
+
+        </View>
+
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -194,129 +205,172 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 0.5,
   },
-  loadingContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-  },
-  loadingText: {
-    color: "rgba(255, 255, 255, 0.5)",
-    fontSize: 14,
-    fontWeight: "600",
-  },
   scrollContent: {
     padding: 24,
     gap: 24,
   },
-  banner: {
-    backgroundColor: "rgba(255, 94, 58, 0.08)",
-    borderRadius: 20,
+  greetingBanner: {
+    backgroundColor: "rgba(30, 30, 35, 0.6)",
+    borderRadius: 24,
     borderWidth: 1,
-    borderColor: "rgba(255, 94, 58, 0.2)",
-    padding: 20,
-    alignItems: "center",
+    borderColor: "rgba(255, 255, 255, 0.08)",
+    padding: 24,
+    position: "relative",
+    overflow: "hidden",
   },
-  bannerTitle: {
-    color: "#FFFFFF",
-    fontSize: 22,
-    fontWeight: "900",
-    letterSpacing: 0.5,
+  accentBar: {
+    position: "absolute",
+    top: 0,
+    left: 24,
+    right: 24,
+    height: 4,
+    backgroundColor: "#FF5E3A",
+    borderBottomLeftRadius: 4,
+    borderBottomRightRadius: 4,
   },
-  bannerSubtitle: {
+  greetingSub: {
     color: "#FF5E3A",
     fontSize: 13,
+    fontWeight: "800",
+    letterSpacing: 1.5,
+    textTransform: "uppercase",
+    marginBottom: 4,
+  },
+  greetingTitle: {
+    color: "#FFFFFF",
+    fontSize: 24,
+    fontWeight: "900",
+    marginBottom: 8,
+  },
+  greetingText: {
+    color: "rgba(255, 255, 255, 0.65)",
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: "500",
+  },
+  shiftCard: {
+    backgroundColor: "rgba(255, 255, 255, 0.03)",
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.05)",
+    padding: 16,
+  },
+  shiftRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  divider: {
+    width: 1,
+    height: 40,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+  },
+  shiftLabel: {
+    color: "rgba(255, 255, 255, 0.35)",
+    fontSize: 9,
+    fontWeight: "800",
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+  shiftValue: {
+    color: "#FFFFFF",
+    fontSize: 13,
     fontWeight: "700",
-    marginTop: 4,
+  },
+  statusRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  activeDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#4CAF50",
+  },
+  shiftValueActive: {
+    color: "#4CAF50",
+    fontSize: 13,
+    fontWeight: "800",
     letterSpacing: 0.5,
   },
   sectionTitle: {
     color: "rgba(255, 255, 255, 0.4)",
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "800",
     letterSpacing: 1.5,
     marginBottom: -8,
   },
-  statsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 16,
-  },
-  statCard: {
-    backgroundColor: "rgba(30, 30, 35, 0.6)",
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.08)",
-    width: "47%",
-    padding: 16,
-    alignItems: "center",
-    gap: 6,
-  },
-  statEmoji: {
-    fontSize: 24,
-  },
-  statNumber: {
-    color: "#FFFFFF",
-    fontSize: 22,
-    fontWeight: "900",
-  },
-  statLabel: {
-    color: "rgba(255, 255, 255, 0.5)",
-    fontSize: 12,
-    fontWeight: "600",
-    textAlign: "center",
-  },
-  actionCard: {
-    backgroundColor: "rgba(30, 30, 35, 0.6)",
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.08)",
-    padding: 20,
+  shortcutsContainer: {
     gap: 12,
   },
-  actionCardTitle: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "800",
-    marginBottom: 4,
+  shortcutCard: {
+    borderRadius: 20,
+    borderWidth: 1.5,
+    padding: 18,
+    gap: 8,
   },
-  alertRow: {
-    width: "100%",
+  shortcutGreen: {
+    backgroundColor: "rgba(76, 175, 80, 0.04)",
+    borderColor: "rgba(76, 175, 80, 0.15)",
   },
-  alertPillWarning: {
-    backgroundColor: "rgba(255, 179, 0, 0.1)",
-    borderColor: "rgba(255, 179, 0, 0.25)",
-    borderWidth: 1,
-    color: "#FFB300",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 12,
-    fontWeight: "700",
-    overflow: "hidden",
+  shortcutOrange: {
+    backgroundColor: "rgba(255, 94, 58, 0.04)",
+    borderColor: "rgba(255, 94, 58, 0.15)",
   },
-  alertPillDanger: {
-    backgroundColor: "rgba(244, 67, 54, 0.1)",
-    borderColor: "rgba(244, 67, 54, 0.25)",
-    borderWidth: 1,
-    color: "#F44336",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 12,
-    fontWeight: "700",
-    overflow: "hidden",
+  shortcutPurple: {
+    backgroundColor: "rgba(156, 39, 176, 0.04)",
+    borderColor: "rgba(156, 39, 176, 0.15)",
   },
-  alertPillSuccess: {
-    backgroundColor: "rgba(76, 175, 80, 0.1)",
-    borderColor: "rgba(76, 175, 80, 0.25)",
-    borderWidth: 1,
+  shortcutHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  shortcutIcon: {
+    fontSize: 18,
+  },
+  shortcutTitleGreen: {
     color: "#4CAF50",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    fontSize: 14,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+  },
+  shortcutTitleOrange: {
+    color: "#FF5E3A",
+    fontSize: 14,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+  },
+  shortcutTitlePurple: {
+    color: "#BF5AF2",
+    fontSize: 14,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+  },
+  shortcutDesc: {
+    color: "rgba(255, 255, 255, 0.6)",
     fontSize: 12,
-    fontWeight: "700",
-    overflow: "hidden",
+    lineHeight: 16,
+    fontWeight: "500",
+  },
+  shortcutArrowContainer: {
+    alignItems: "flex-end",
+    marginTop: 4,
+  },
+  shortcutArrowGreen: {
+    color: "#4CAF50",
+    fontSize: 11,
+    fontWeight: "800",
+  },
+  shortcutArrowOrange: {
+    color: "#FF5E3A",
+    fontSize: 11,
+    fontWeight: "800",
+  },
+  shortcutArrowPurple: {
+    color: "#BF5AF2",
+    fontSize: 11,
+    fontWeight: "800",
   },
 });

@@ -9,7 +9,6 @@ import {
   Modal,
   Alert,
   ActivityIndicator,
-  SafeAreaView,
   Platform,
   StatusBar,
 } from "react-native";
@@ -30,6 +29,7 @@ import {
   getMembershipPlans,
   MembershipPlan,
 } from "../../services/receptionist.service";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "ReceptionTabs">;
@@ -387,17 +387,23 @@ export default function MembersTab({ navigation }: Props) {
           onChangeText={setSearch}
         />
         <View style={styles.tabFilters}>
-          {["ALL", "ACTIVE", "EXPIRED", "FROZEN", "CANCELLED"].map((status) => (
-            <TouchableOpacity
-              key={status}
-              style={[styles.filterPill, statusFilter === status && styles.filterPillActive]}
-              onPress={() => setStatusFilter(status)}
-            >
-              <Text style={[styles.filterPillText, statusFilter === status && styles.filterPillTextActive]}>
-                {status}
-              </Text>
-            </TouchableOpacity>
-          ))}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 8, alignItems: "center" }}
+          >
+            {["ALL", "ACTIVE", "EXPIRED", "FROZEN", "CANCELLED"].map((status) => (
+              <TouchableOpacity
+                key={status}
+                style={[styles.filterPill, statusFilter === status && styles.filterPillActive]}
+                onPress={() => setStatusFilter(status)}
+              >
+                <Text style={[styles.filterPillText, statusFilter === status && styles.filterPillTextActive]}>
+                  {status}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
 
         {/* Plans Filter Horizontal Row */}
@@ -586,11 +592,7 @@ export default function MembersTab({ navigation }: Props) {
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>CHOOSE MEMBERSHIP PLAN *</Text>
                 <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", gap: 10, marginTop: 4 }}>
-                  {(allPlans.length > 0 ? allPlans : [
-                    { id: 1, name: "Monthly Plan", price: 1500 },
-                    { id: 2, name: "Quarterly Plan", price: 4000 },
-                    { id: 3, name: "Yearly Plan", price: 12000 },
-                  ]).map((plan) => (
+                  {allPlans.map((plan) => (
                     <TouchableOpacity
                       key={plan.id}
                       style={[
@@ -1033,11 +1035,7 @@ export default function MembersTab({ navigation }: Props) {
                     <View style={styles.inputGroup}>
                       <Text style={styles.inputLabel}>CHOOSE MEMBERSHIP PLAN</Text>
                       <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", gap: 10, marginTop: 4 }}>
-                        {(allPlans.length > 0 ? allPlans : [
-                          { id: 1, name: "Monthly Plan", price: 1500 },
-                          { id: 2, name: "Quarterly Plan", price: 4000 },
-                          { id: 3, name: "Yearly Plan", price: 12000 },
-                        ]).map((plan) => (
+                        {allPlans.map((plan) => (
                           <TouchableOpacity
                             key={plan.id}
                             style={[
@@ -1305,7 +1303,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 24,
-    paddingVertical: 18,
+    // paddingVertical: 4,
     borderBottomWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.08)",
   },

@@ -11,9 +11,9 @@ import {
   Platform,
   Alert,
   StatusBar,
-  SafeAreaView,
   ActivityIndicator,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/types";
@@ -117,7 +117,7 @@ export default function LoginScreen({ navigation, route }: Props) {
             <View style={styles.header}>
               <TouchableOpacity
                 style={styles.backButton}
-                onPress={() => navigation.navigate("Welcome")}
+                onPress={() => navigation.goBack()}
               >
                 <Text style={styles.backButtonText}>← BACK</Text>
               </TouchableOpacity>
