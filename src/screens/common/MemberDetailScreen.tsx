@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   Alert,
   Platform,
@@ -18,6 +17,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   getMemberPtSessions,
 } from "../../services/receptionist.service";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   useFreezeMember,
   useUnfreezeMember,
