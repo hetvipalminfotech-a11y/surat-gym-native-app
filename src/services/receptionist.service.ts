@@ -262,3 +262,70 @@ export const cancelPtSession = async (id: number): Promise<unknown> => {
   return unwrap<unknown>(res);
 };
 
+export const getMembersPaginated = async (
+  page = 1,
+  limit = 20,
+  search?: string,
+  status?: string,
+  planId?: number | string
+): Promise<PaginatedMembers> => {
+  let url = `/members?page=${page}&limit=${limit}`;
+  if (status && status !== "ALL") {
+    url += `&status=${status}`;
+  }
+  if (planId) {
+    url += `&planId=${planId}`;
+  }
+  if (search && search.trim() !== "") {
+    url += `&search=${encodeURIComponent(search.trim())}`;
+  }
+  const res = await API.get<NestResponseWrapper<PaginatedMembers> | PaginatedMembers>(url);
+  return unwrap<PaginatedMembers>(res);
+};
+
+export const getPtSessionsPaginated = async (
+  page = 1,
+  limit = 20,
+  status?: string,
+  date?: string
+): Promise<PaginatedSessionsResponse> => {
+  let url = `/pt-sessions?page=${page}&limit=${limit}`;
+  if (status && status !== "ALL") {
+    url += `&status=${status}`;
+  }
+  if (date) {
+    url += `&date=${date}`;
+  }
+  const res = await API.get<NestResponseWrapper<PaginatedSessionsResponse> | PaginatedSessionsResponse>(url);
+  return unwrap<PaginatedSessionsResponse>(res);
+};
+
+export const completePtSession = async (id: number): Promise<unknown> => {
+  const res = await API.patch<NestResponseWrapper<unknown> | unknown>(`/pt-sessions/${id}/complete`);
+  return unwrap<unknown>(res);
+};
+
+export const noShowPtSession = async (id: number): Promise<unknown> => {
+  const res = await API.patch<NestResponseWrapper<unknown> | unknown>(`/pt-sessions/${id}/no-show`);
+  return unwrap<unknown>(res);
+};
+
+export interface BulkSlotItem {
+  startTime: string;
+  endTime: string;
+}
+
+export const createBulkSlots = async (
+  trainerId: number,
+  slotDate: string,
+  slots: BulkSlotItem[]
+): Promise<Slot[]> => {
+  const res = await API.post<NestResponseWrapper<Slot[]> | Slot[]>(
+    `/trainers/${trainerId}/slots/bulk`,
+    { slotDate, slots }
+  );
+  const data = unwrap<Slot[]>(res);
+  return Array.isArray(data) ? data : [];
+};
+
+

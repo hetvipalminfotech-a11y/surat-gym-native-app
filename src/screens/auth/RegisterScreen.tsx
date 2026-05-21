@@ -18,6 +18,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/types";
 import { registerUser } from "../../services/auth.service";
 import { ApiError } from "../../types/auth.types";
+import { Ionicons } from "@expo/vector-icons";
 
 type RegisterScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -201,6 +202,16 @@ export default function RegisterScreen({ navigation }: Props) {
       <View style={styles.overlay} />
 
       <SafeAreaView style={styles.container}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+            <Ionicons name="chevron-back" size={16} color="#FF5E3A" />
+            <Text style={styles.backButtonText}>BACK</Text>
+          </View>
+        </TouchableOpacity>
+
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.keyboardView}
@@ -208,15 +219,10 @@ export default function RegisterScreen({ navigation }: Props) {
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
           >
             {/* Header */}
             <View style={styles.header}>
-              <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => navigation.navigate("Welcome")}
-              >
-                <Text style={styles.backButtonText}>← BACK</Text>
-              </TouchableOpacity>
               <Text style={styles.title}>Create Account</Text>
               <Text style={styles.subtitle}>Join Surat Gym Hub as a Receptionist</Text>
             </View>
@@ -369,18 +375,21 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     paddingHorizontal: 24,
-    paddingTop: Platform.OS === "ios" ? 40 : 60,
+    paddingTop: Platform.OS === "ios" ? 60 : 70,
     paddingBottom: 40,
   },
   header: {
     marginBottom: 28,
   },
   backButton: {
-    alignSelf: "flex-start",
-    marginBottom: 20,
-    paddingVertical: 4,
+    position: "absolute",
+    top: 35,
+    left: 0,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    zIndex: 10,
   },
   backButtonText: {
     color: "#FF5E3A",

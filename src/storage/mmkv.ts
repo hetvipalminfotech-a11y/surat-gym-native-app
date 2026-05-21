@@ -35,6 +35,14 @@ export const getToken = (): string | undefined => {
   return storage.getString("token");
 };
 
+export const setRefreshToken = (token: string): void => {
+  storage.set("refreshToken", token);
+};
+
+export const getRefreshToken = (): string | undefined => {
+  return storage.getString("refreshToken");
+};
+
 
 // USER
 export const setUser = (user: User): void => {

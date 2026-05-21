@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, Button } from "react-native";
-import { getUser, clearStorage } from "../../storage/mmkv";
+import { useAuthStore } from "../../store/useAuthStore";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/types";
 
@@ -14,10 +14,10 @@ type Props = {
 };
 
 export default function TrainerHome({ navigation }: Props) {
-  const user = getUser();
+  const { user, logout } = useAuthStore();
 
   const handleLogout = () => {
-    clearStorage();
+    logout();
   };
 
   return (

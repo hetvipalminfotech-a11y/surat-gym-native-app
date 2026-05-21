@@ -1,42 +1,46 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Text, StyleSheet, Platform } from "react-native";
+import { StyleSheet, Platform } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
-import DashboardTab from "../screens/receptionist/DashboardTab";
-import MembersTab from "../screens/receptionist/MembersTab";
-import PtSessionsTab from "../screens/receptionist/PtSessionsTab";
 import AttendanceTab from "../screens/receptionist/AttendanceTab";
+import MembersTab from "../screens/common/MembersTab";
+import PtSessionsTab from "../screens/common/PtSessionsTab";
+import ProfileTab from "../screens/common/ProfileTab";
 
 const Tab = createBottomTabNavigator();
 
 export default function ReceptionTabs() {
   return (
     <Tab.Navigator
+      initialRouteName="Attendance"
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: "#FF5E3A",
         tabBarInactiveTintColor: "rgba(255, 255, 255, 0.4)",
         tabBarLabelStyle: styles.tabBarLabel,
         tabBarStyle: styles.tabBar,
-        tabBarIcon: ({ focused }) => {
-          let icon = "📊";
-          if (route.name === "Dashboard") icon = "📊";
-          else if (route.name === "Members") icon = "👥";
-          else if (route.name === "Pt-sessions") icon = "🗓️";
-          else if (route.name === "Attendance") icon = "📝";
+        tabBarIcon: ({ focused, color }) => {
+          let iconName: React.ComponentProps<typeof Ionicons>["name"] = "document-text";
 
-          return (
-            <Text style={[styles.tabIcon, focused && styles.tabIconActive]}>
-              {icon}
-            </Text>
-          );
+          if (route.name === "Attendance") {
+            iconName = focused ? "document-text" : "document-text-outline";
+          } else if (route.name === "Members") {
+            iconName = focused ? "people" : "people-outline";
+          } else if (route.name === "Pt-sessions") {
+            iconName = focused ? "calendar" : "calendar-outline";
+          } else if (route.name === "Profile") {
+            iconName = focused ? "person" : "person-outline";
+          }
+
+          return <Ionicons name={iconName} size={22} color={color} />;
         },
       })}
     >
-      <Tab.Screen name="Dashboard" component={DashboardTab} />
+      <Tab.Screen name="Attendance" component={AttendanceTab} />
       <Tab.Screen name="Members" component={MembersTab} />
       <Tab.Screen name="Pt-sessions" component={PtSessionsTab} />
-      <Tab.Screen name="Attendance" component={AttendanceTab} />
+      <Tab.Screen name="Profile" component={ProfileTab} />
     </Tab.Navigator>
   );
 }
@@ -56,12 +60,5 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     marginTop: 2,
   },
-  tabIcon: {
-    fontSize: 20,
-    opacity: 0.6,
-  },
-  tabIconActive: {
-    opacity: 1,
-    transform: [{ scale: 1.15 }],
-  },
 });
+

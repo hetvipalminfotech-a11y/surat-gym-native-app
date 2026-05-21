@@ -1,43 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { NavigationIndependentTree, NavigationContainer } from "@react-navigation/native";
-import { View } from "react-native";
 import AuthStack from "@/navigation/AuthStack";
 import AppStack from "@/navigation/AppStack";
-import { getToken, getUser, storage } from "@/storage/mmkv";
+import { useAuthStore } from "@/store/useAuthStore";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            retry: 1,
+            refetchOnWindowFocus: false,
+            staleTime: 1000 * 60 * 5, // 5 minutes standard stale time
+        },
+    },
+});
 
 export default function App() {
-    const [loading, setLoading] = useState(true);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-    useEffect(() => {
-        const checkAuth = () => {
-            const token = getToken();
-            const user = getUser();
-            setIsLoggedIn(!!(token && user));
-        };
-
-        checkAuth();
-        setLoading(false);
-
-        // Listen for storage changes reactively (login or logout)
-        const listener = storage.addOnValueChangedListener((key) => {
-            if (key === "token" || key === "user") {
-                checkAuth();
-            }
-        });
-
-        return () => {
-            listener.remove();
-        };
-    }, []);
-
-    if (loading) return null;
+    const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
     return (
-        <NavigationIndependentTree>
-            <NavigationContainer>
-                {isLoggedIn ? <AppStack /> : <AuthStack />}
-            </NavigationContainer>
-        </NavigationIndependentTree>
+        <QueryClientProvider client={queryClient}>
+            <NavigationIndependentTree>
+                <NavigationContainer>
+                    {isLoggedIn ? <AppStack /> : <AuthStack />}
+                </NavigationContainer>
+            </NavigationIndependentTree>
+        </QueryClientProvider>
     );
 }

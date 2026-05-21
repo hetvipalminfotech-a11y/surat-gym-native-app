@@ -18,8 +18,9 @@ import { RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/types";
 import { loginUser } from "../../services/auth.service";
-import { setToken, setUser } from "../../storage/mmkv";
+import { useAuthStore } from "../../store/useAuthStore";
 import { ApiError, UserRole } from "../../types/auth.types";
+import { Ionicons } from "@expo/vector-icons";
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -34,6 +35,7 @@ type Props = {
 };
 
 export default function LoginScreen({ navigation, route }: Props) {
+  const login = useAuthStore((state) => state.login);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -77,9 +79,8 @@ export default function LoginScreen({ navigation, route }: Props) {
         return;
       }
 
-      // Save tokens to MMKV secure storage
-      setToken(data.accessToken);
-      setUser(data.user);
+      // Save tokens to Zustand secure store (which also handles MMKV persistence)
+      login(data.user, data.accessToken, data.refreshToken);
 
     } catch (err) {
       const error = err as ApiError;
@@ -105,6 +106,16 @@ export default function LoginScreen({ navigation, route }: Props) {
       <View style={styles.overlay} />
 
       <SafeAreaView style={styles.container}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+            <Ionicons name="chevron-back" size={16} color="#FF5E3A" />
+            <Text style={styles.backButtonText}>BACK</Text>
+          </View>
+        </TouchableOpacity>
+
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.keyboardView}
@@ -112,15 +123,10 @@ export default function LoginScreen({ navigation, route }: Props) {
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
           >
             {/* Back Button and Title */}
             <View style={styles.header}>
-              <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => navigation.goBack()}
-              >
-                <Text style={styles.backButtonText}>← BACK</Text>
-              </TouchableOpacity>
               <Text style={styles.title}>Welcome Back</Text>
               <Text style={styles.subtitle}>Sign in to your Surat Gym Hub account</Text>
             </View>
@@ -226,16 +232,19 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     paddingHorizontal: 24,
-    paddingTop: Platform.OS === "ios" ? 40 : 60,
+    paddingTop: Platform.OS === "ios" ? 60 : 70,
     paddingBottom: 40,
   },
   header: {
     marginBottom: 28,
   },
   backButton: {
-    alignSelf: "flex-start",
-    marginBottom: 20,
-    paddingVertical: 4,
+    position: "absolute",
+    top: 35,
+    left: 0,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    zIndex: 10,
   },
   backButtonText: {
     color: "#FF5E3A",
