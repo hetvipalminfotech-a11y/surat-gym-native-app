@@ -183,7 +183,7 @@ export default function MemberDetailScreen({ route, navigation }: Props) {
         >
           <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
             <Ionicons name="chevron-back" size={14} color="#FF5E3A" />
-            <Text style={styles.backButtonText}>BACK</Text>
+
           </View>
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
@@ -273,6 +273,8 @@ export default function MemberDetailScreen({ route, navigation }: Props) {
           <>
             <Text style={styles.sectionLabel}>MEMBERSHIP CONSOLE ACTIONS</Text>
             <View style={styles.actionGrid}>
+
+              {/* EDIT BUTTON ALWAYS */}
               <View style={styles.actionRow}>
                 <TouchableOpacity
                   style={[styles.actionBtn, styles.actionEdit]}
@@ -284,44 +286,50 @@ export default function MemberDetailScreen({ route, navigation }: Props) {
                   </View>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={[
-                    styles.actionBtn,
-                    styles.actionRenew,
-                    member.status === "FROZEN" && styles.actionDisabled,
-                  ]}
-                  disabled={member.status === "FROZEN"}
-                  onPress={() => navigation.navigate("RenewPlan", { member })}
-                  activeOpacity={0.7}
-                >
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                    <Ionicons name="flash-outline" size={16} color="#FFFFFF" />
-                    <Text style={styles.actionBtnText}>RENEW PLAN</Text>
-                  </View>
-                </TouchableOpacity>
+                {/* RENEW PLAN ONLY IF NOT CANCELLED */}
+                {member.status !== "CANCELLED" && (
+                  <TouchableOpacity
+                    style={[
+                      styles.actionBtn,
+                      styles.actionRenew,
+                      member.status === "FROZEN" && styles.actionDisabled,
+                    ]}
+                    disabled={member.status === "FROZEN"}
+                    onPress={() => navigation.navigate("RenewPlan", { member })}
+                  >
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                      <Ionicons name="flash-outline" size={16} color="#FFFFFF" />
+                      <Text style={styles.actionBtnText}>RENEW PLAN</Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
               </View>
 
-              {member.status === "ACTIVE" ? (
-                <TouchableOpacity
-                  style={[styles.actionBtn, styles.actionFullWidth, styles.actionFreeze]}
-                  onPress={handleFreeze}
-                >
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                    <Ionicons name="snow" size={16} color="#FFFFFF" />
-                    <Text style={styles.actionBtnText}>FREEZE PLAN</Text>
-                  </View>
-                </TouchableOpacity>
-              ) : member.status === "FROZEN" ? (
-                <TouchableOpacity
-                  style={[styles.actionBtn, styles.actionFullWidth, styles.actionUnfreeze]}
-                  onPress={handleUnfreeze}
-                >
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                    <Ionicons name="flame" size={16} color="#FFFFFF" />
-                    <Text style={styles.actionBtnText}>ACTIVATE PLAN</Text>
-                  </View>
-                </TouchableOpacity>
-              ) : null}
+              {/* FREEZE / ACTIVATE ONLY IF NOT CANCELLED */}
+              {member.status !== "CANCELLED" && (
+                member.status === "ACTIVE" ? (
+                  <TouchableOpacity
+                    style={[styles.actionBtn, styles.actionFullWidth, styles.actionFreeze]}
+                    onPress={handleFreeze}
+                  >
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                      <Ionicons name="snow" size={16} color="#FFFFFF" />
+                      <Text style={styles.actionBtnText}>FREEZE PLAN</Text>
+                    </View>
+                  </TouchableOpacity>
+                ) : member.status === "FROZEN" ? (
+                  <TouchableOpacity
+                    style={[styles.actionBtn, styles.actionFullWidth, styles.actionUnfreeze]}
+                    onPress={handleUnfreeze}
+                  >
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                      <Ionicons name="flame" size={16} color="#FFFFFF" />
+                      <Text style={styles.actionBtnText}>ACTIVATE PLAN</Text>
+                    </View>
+                  </TouchableOpacity>
+                ) : null
+              )}
+
             </View>
           </>
         )}
@@ -383,7 +391,7 @@ export default function MemberDetailScreen({ route, navigation }: Props) {
                     </View>
 
                     {/* Direct actions for BOOKED status */}
-                    {sess.status === "BOOKED" && (
+                    {/* {sess.status === "BOOKED" && (
                       <View style={{ marginTop: 12, borderTopWidth: 1, borderTopColor: "rgba(255, 255, 255, 0.05)", paddingTop: 12 }}>
                         {loadingSessionId === sess.id ? (
                           <ActivityIndicator size="small" color="#FF5E3A" />
@@ -427,7 +435,7 @@ export default function MemberDetailScreen({ route, navigation }: Props) {
                           </View>
                         )}
                       </View>
-                    )}
+                    )} */}
                   </View>
                 ))}
               </View>
@@ -443,7 +451,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#1c1c1fff",
-    paddingTop: Platform.OS === "ios" ? 0 : (StatusBar.currentHeight || 24),
+    // paddingTop: Platform.OS === "ios" ? 0 : (StatusBar.currentHeight || 24),
   },
   header: {
     flexDirection: "row",
@@ -621,8 +629,8 @@ const styles = StyleSheet.create({
     borderColor: "rgba(255, 255, 255, 0.1)",
   },
   actionRenew: {
-    backgroundColor: "rgba(255, 94, 58, 0.05)",
-    borderColor: "rgba(255, 94, 58, 0.25)",
+    backgroundColor: "rgba(255, 255, 255, 0.03)",
+    borderColor: "rgba(255, 255, 255, 0.1)",
   },
   actionDisabled: {
     backgroundColor: "rgba(255, 255, 255, 0.02)",
@@ -630,8 +638,8 @@ const styles = StyleSheet.create({
     opacity: 0.35,
   },
   actionFreeze: {
-    backgroundColor: "rgba(244, 67, 54, 0.05)",
-    borderColor: "rgba(244, 67, 54, 0.2)",
+    backgroundColor: "rgba(255, 255, 255, 0.03)",
+    borderColor: "rgba(255, 255, 255, 0.1)",
   },
   actionUnfreeze: {
     backgroundColor: "rgba(76, 175, 80, 0.05)",

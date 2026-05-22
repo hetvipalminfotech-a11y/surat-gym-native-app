@@ -131,7 +131,7 @@ export default function AddSlotsScreen({ route, navigation }: Props) {
           activeOpacity={0.8}
         >
           <Ionicons name="chevron-back" size={14} color="rgba(255, 255, 255, 0.6)" />
-          <Text style={styles.backButtonText}>CANCEL</Text>
+
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
           <Text style={styles.headerSubtitle}>Publish Availability</Text>

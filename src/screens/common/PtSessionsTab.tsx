@@ -159,31 +159,21 @@ export default function PtSessionsTab({ navigation }: Props) {
     <SafeAreaView style={styles.container}>
       {/* Header with inline Book Session Trigger */}
       <View style={styles.header}>
-        <View style={styles.headerTitleContainer}>
+        <View style={{ flex: 1 }}>
           <Text style={styles.headerTitle}>PT Session Slots</Text>
           <Text style={styles.headerSubtitle}>Locked & Secured Booking</Text>
         </View>
+
         {!isTrainer ? (
           <TouchableOpacity
-            style={{
-              backgroundColor: "#FF5E3A",
-              paddingHorizontal: 14,
-              paddingVertical: 10,
-              borderRadius: 12,
-              shadowColor: "#FF5E3A",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.3,
-              shadowRadius: 6,
-              elevation: 3,
-              zIndex: 10,
-              marginLeft: "auto",
-            }}
+            style={styles.bookBtn}
             onPress={() => navigation.navigate("BookPtSession")}
+            activeOpacity={0.8}
           >
-            <Text style={{ color: "#FFFFFF", fontSize: 13, fontWeight: "900", letterSpacing: 0.5 }}>+ BOOK SESSION</Text>
+            <Text style={styles.bookBtnText}>+ BOOK SESSION</Text>
           </TouchableOpacity>
         ) : (
-          <View />
+          <View style={{ width: 120 }} /> // keeps layout balanced
         )}
       </View>
 
@@ -356,8 +346,9 @@ export default function PtSessionsTab({ navigation }: Props) {
 
               {/* Actions Column (Complete and Cancel buttons) */}
               {sess.status === "BOOKED" ? (
-                <View style={{ marginTop: 6 }}>
-                  <View style={{ flexDirection: "row", gap: 10 }}>
+                <View style={{ flexDirection: "row", gap: 10 }}>
+
+                  {isTrainer && (
                     <TouchableOpacity
                       style={{
                         flex: 1,
@@ -368,7 +359,7 @@ export default function PtSessionsTab({ navigation }: Props) {
                         justifyContent: "center",
                       }}
                       onPress={(e) => {
-                        e.stopPropagation(); // Prevent modal popping up on button tap!
+                        e.stopPropagation();
                         handleCompleteSession(sess.id);
                       }}
                       activeOpacity={0.8}
@@ -377,29 +368,30 @@ export default function PtSessionsTab({ navigation }: Props) {
                         COMPLETE
                       </Text>
                     </TouchableOpacity>
+                  )}
 
-                    <TouchableOpacity
-                      style={{
-                        flex: 1,
-                        borderWidth: 1,
-                        borderColor: "rgba(244, 67, 54, 0.5)",
-                        backgroundColor: "rgba(244, 67, 54, 0.05)",
-                        borderRadius: 12,
-                        height: 38,
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                      onPress={(e) => {
-                        e.stopPropagation(); // Prevent modal popping up on button tap!
-                        handleCancelSession(sess.id);
-                      }}
-                      activeOpacity={0.8}
-                    >
-                      <Text style={{ color: "#F44336", fontSize: 11, fontWeight: "800", letterSpacing: 0.5 }}>
-                        CANCEL
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
+                  <TouchableOpacity
+                    style={{
+                      flex: 1,
+                      borderWidth: 1,
+                      borderColor: "rgba(244, 67, 54, 0.5)",
+                      backgroundColor: "rgba(244, 67, 54, 0.05)",
+                      borderRadius: 12,
+                      height: 38,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      handleCancelSession(sess.id);
+                    }}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={{ color: "#F44336", fontSize: 11, fontWeight: "800", letterSpacing: 0.5 }}>
+                      CANCEL
+                    </Text>
+                  </TouchableOpacity>
+
                 </View>
               ) : null}
             </TouchableOpacity>
@@ -536,41 +528,48 @@ const styles = StyleSheet.create({
     backgroundColor: "#1c1c1fff",
     paddingTop: Platform.OS === "ios" ? 48 : (StatusBar.currentHeight || 24),
   },
+
   header: {
     paddingHorizontal: 24,
-    paddingVertical: 18,
+    paddingVertical: 16,
     borderBottomWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.08)",
-    position: "relative",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     minHeight: 76,
   },
-  headerTitleContainer: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1,
-  },
+
   headerTitle: {
     color: "#FFFFFF",
     fontSize: 20,
     fontWeight: "900",
     letterSpacing: 0.5,
-    textAlign: "center",
   },
+
   headerSubtitle: {
     color: "#FF5E3A",
     fontSize: 12,
-    fontWeight: "bold",
+    fontWeight: "700",
     marginTop: 2,
+  },
+  bookBtn: {
+    backgroundColor: "#FF5E3A",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
+    shadowColor: "#FF5E3A",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+
+  bookBtnText: {
+    color: "#FFFFFF",
+    fontSize: 13,
+    fontWeight: "900",
     letterSpacing: 0.5,
-    textAlign: "center",
   },
   sectionTitle: {
     color: "rgba(255, 255, 255, 0.4)",

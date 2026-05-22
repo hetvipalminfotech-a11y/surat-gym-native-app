@@ -115,7 +115,7 @@ export default function EditMemberScreen({ route, navigation }: Props) {
       <View style={styles.header}>
         <TouchableOpacity style={[styles.backButton, { flexDirection: "row", alignItems: "center", gap: 4, zIndex: 10 }]} onPress={() => navigation.goBack()}>
           <Ionicons name="chevron-back" size={14} color="rgba(255, 255, 255, 0.6)" />
-          <Text style={styles.backButtonText}>CANCEL</Text>
+
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
           <Text style={styles.headerTitle}>EDIT PROFILE</Text>

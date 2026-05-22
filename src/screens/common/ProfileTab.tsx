@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   Alert,
   Platform,
@@ -16,7 +15,7 @@ import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { CompositeNavigationProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList, ReceptionTabParamList } from "../../navigation/types";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 type Props = {
   navigation: CompositeNavigationProp<
     BottomTabNavigationProp<ReceptionTabParamList, "Profile">,
@@ -172,7 +171,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#1c1c1fff",
-    paddingTop: Platform.OS === "ios" ? 48 : (StatusBar.currentHeight || 24),
   },
   header: {
     paddingHorizontal: 24,

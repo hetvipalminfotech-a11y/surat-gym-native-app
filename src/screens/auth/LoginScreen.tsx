@@ -22,6 +22,22 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { ApiError, UserRole } from "../../types/auth.types";
 import { Ionicons } from "@expo/vector-icons";
 
+let Notifications: typeof import("expo-notifications") | null = null;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  Notifications = require("expo-notifications");
+  Notifications?.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
+} catch (err) {
+  console.warn("expo-notifications unavailable (use a dev build to enable):", err);
+}
+
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "Login"
@@ -51,6 +67,33 @@ export default function LoginScreen({ navigation, route }: Props) {
     }
   }, [route.params?.email]);
 
+  useEffect(() => {
+    requestPermission();
+  }, []);
+
+  async function requestPermission() {
+    if (!Notifications) return;
+    const { status } = await Notifications.requestPermissionsAsync();
+    console.log("Permission Status:", status);
+  }
+
+  async function sendLoginNotification(name: string, role: string) {
+    if (!Notifications) {
+      console.log("Skipping login notification: expo-notifications not available in this build.");
+      return;
+    }
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Welcome back",
+        body: `${name} — Logged in as ${role}`,
+        data: { screen: "Home" },
+      },
+      trigger: null,
+    });
+
+    console.log("Login Notification Sent!");
+  }
+
   const handleLogin = async () => {
     if (!email.trim() || !password) {
       Alert.alert("Validation Error", "Email and password are required");
@@ -78,6 +121,8 @@ export default function LoginScreen({ navigation, route }: Props) {
         );
         return;
       }
+
+      await sendLoginNotification(data.user.name, data.user.role);
 
       // Save tokens to Zustand secure store (which also handles MMKV persistence)
       login(data.user, data.accessToken, data.refreshToken);

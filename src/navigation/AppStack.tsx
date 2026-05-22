@@ -3,7 +3,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useAuthStore } from "../store/useAuthStore";
 import { RootStackParamList } from "./types";
 
-import TrainerHome from "../screens/trainer/TrainerHome";
 import ReceptionTabs from "./ReceptionTabs";
 import TrainerTabs from "./TrainerTabs";
 import MemberDetailScreen from "../screens/common/MemberDetailScreen";
@@ -27,7 +26,6 @@ export default function AppStack() {
           <Stack.Screen name="MemberDetail" component={MemberDetailScreen} />
           <Stack.Screen name="PtSessionDetail" component={PtSessionDetailScreen} />
           <Stack.Screen name="AddSlots" component={AddSlotsScreen} />
-          <Stack.Screen name="TrainerHome" component={TrainerHome} />
         </>
       ) : (
         <>

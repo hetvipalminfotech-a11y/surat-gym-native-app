@@ -160,7 +160,7 @@ export default function BookPtSessionScreen({ navigation }: Props) {
                 <Text
                   style={{
                     color: selectedMember ? "#FFFFFF" : "rgba(255, 255, 255, 0.4)",
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: "600",
                     flex: 1
                   }}
@@ -207,10 +207,10 @@ export default function BookPtSessionScreen({ navigation }: Props) {
                         }}
                       >
                         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                          <Text style={{ color: "#FFFFFF", fontSize: 13, fontWeight: "700" }}>{m.name}</Text>
-                          <Text style={{ color: "rgba(255, 255, 255, 0.4)", fontSize: 10, fontWeight: "bold" }}>{m.member_code}</Text>
+                          <Text style={{ color: "#FFFFFF", fontSize: 15, fontWeight: "700" }}>{m.name}</Text>
+                          <Text style={{ color: "rgba(255, 255, 255, 0.4)", fontSize: 12, fontWeight: "bold" }}>{m.member_code}</Text>
                         </View>
-                        <Text style={{ color: "#FF5E3A", fontSize: 10, fontWeight: "600", marginTop: 2 }}>
+                        <Text style={{ color: "#FF5E3A", fontSize: 12, fontWeight: "600", marginTop: 2 }}>
                           Sessions Remaining: {m.remaining_pt_sessions}
                         </Text>
                       </TouchableOpacity>
@@ -239,7 +239,7 @@ export default function BookPtSessionScreen({ navigation }: Props) {
                 <Text
                   style={{
                     color: selectedTrainer ? "#FFFFFF" : "rgba(255, 255, 255, 0.4)",
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: "600",
                     flex: 1
                   }}
@@ -271,8 +271,8 @@ export default function BookPtSessionScreen({ navigation }: Props) {
                         setShowTrainerDropdown(false);
                       }}
                     >
-                      <Text style={{ color: "#FFFFFF", fontSize: 13, fontWeight: "700" }}>{t.name}</Text>
-                      <Text style={{ color: "rgba(255, 255, 255, 0.4)", fontSize: 10, fontWeight: "bold", marginTop: 2 }}>{t.specialization}</Text>
+                      <Text style={{ color: "#FFFFFF", fontSize: 15, fontWeight: "700" }}>{t.name}</Text>
+                      <Text style={{ color: "rgba(255, 255, 255, 0.4)", fontSize: 12, fontWeight: "bold", marginTop: 2 }}>{t.specialization}</Text>
                     </TouchableOpacity>
                   ))}
                 </ScrollView>
@@ -293,11 +293,11 @@ export default function BookPtSessionScreen({ navigation }: Props) {
             >
               <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
                 <Ionicons name="calendar-outline" size={18} color="#FF5E3A" />
-                <Text style={{ color: "#FFFFFF", fontSize: 14, fontWeight: "600" }}>
+                <Text style={{ color: "#FFFFFF", fontSize: 16, fontWeight: "600" }}>
                   {bookingDate}
                 </Text>
               </View>
-              <Text style={{ color: "#FF5E3A", fontSize: 12, fontWeight: "bold" }}>CHANGE</Text>
+              <Text style={{ color: "#FF5E3A", fontSize: 14, fontWeight: "bold" }}>CHANGE</Text>
             </TouchableOpacity>
           </View>
 
@@ -307,7 +307,7 @@ export default function BookPtSessionScreen({ navigation }: Props) {
             {isLoadingSlots && slots.length === 0 ? (
               <ActivityIndicator size="small" color="#FF5E3A" style={{ marginVertical: 20 }} />
             ) : slots.length === 0 ? (
-              <Text style={{ color: "rgba(255, 255, 255, 0.4)", fontSize: 13, marginTop: 8, fontStyle: "italic" }}>
+              <Text style={{ color: "rgba(255, 255, 255, 0.4)", fontSize: 15, marginTop: 8, fontStyle: "italic" }}>
                 No active slots created for this date.
               </Text>
             ) : (
@@ -344,12 +344,12 @@ export default function BookPtSessionScreen({ navigation }: Props) {
                       onPress={() => setSelectedSlot(slot)}
                     >
                       <Text style={[
-                        { color: "#FFFFFF", fontSize: 13, fontWeight: "bold" },
+                        { color: "#FFFFFF", fontSize: 15, fontWeight: "bold" },
                         isSlotSelected && { color: "#FF5E3A" }
                       ]}>
-                        {slot.start_time} - {slot.end_time}
+                        {slot.start_time.slice(0, 5)} - {slot.end_time.slice(0, 5)}
                       </Text>
-                      <Text style={{ color: "rgba(255, 255, 255, 0.35)", fontSize: 10, marginTop: 2, fontWeight: "700" }}>
+                      <Text style={{ color: "rgba(255, 255, 255, 0.35)", fontSize: 12, marginTop: 2, fontWeight: "700" }}>
                         {slot.status}
                       </Text>
                     </TouchableOpacity>
@@ -363,9 +363,9 @@ export default function BookPtSessionScreen({ navigation }: Props) {
           {selectedSlot && (
             <View style={[styles.slotSummary, { marginTop: 12 }]}>
               <Text style={styles.summaryLabel}>SELECTED SLOT SCHEDULE</Text>
-              <Text style={styles.summaryValue}>{selectedSlot.start_time} - {selectedSlot.end_time}</Text>
+              <Text style={styles.summaryValue}>{selectedSlot.start_time.slice(0, 5)} - {selectedSlot.end_time.slice(0, 5)}</Text>
               <Text style={styles.summaryTrainer}>Trainer: {selectedTrainer?.name}</Text>
-              <Text style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: 11, fontWeight: "600", marginTop: 2 }}>Date: {bookingDate}</Text>
+              <Text style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: 13, fontWeight: "600", marginTop: 2 }}>Date: {bookingDate}</Text>
             </View>
           )}
 
@@ -427,7 +427,7 @@ export default function BookPtSessionScreen({ navigation }: Props) {
               >
                 <Ionicons name="chevron-back" size={20} color="#FF5E3A" />
               </TouchableOpacity>
-              <Text style={{ color: "#FFFFFF", fontSize: 16, fontWeight: "900" }}>
+              <Text style={{ color: "#FFFFFF", fontSize: 18, fontWeight: "900" }}>
                 {new Date(bookingCalendarYear, bookingCalendarMonth).toLocaleString("en-US", { month: "long" })} {bookingCalendarYear}
               </Text>
               <TouchableOpacity
@@ -448,7 +448,7 @@ export default function BookPtSessionScreen({ navigation }: Props) {
             {/* Weekdays Row */}
             <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 8 }}>
               {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
-                <Text key={day} style={{ color: "rgba(255, 255, 255, 0.3)", width: 36, textAlign: "center", fontSize: 11, fontWeight: "700" }}>{day}</Text>
+                <Text key={day} style={{ color: "rgba(255, 255, 255, 0.3)", width: 36, textAlign: "center", fontSize: 13, fontWeight: "700" }}>{day}</Text>
               ))}
             </View>
 
@@ -482,7 +482,7 @@ export default function BookPtSessionScreen({ navigation }: Props) {
                     }}
                   >
                     <Text style={[
-                      { color: "rgba(255, 255, 255, 0.8)", fontSize: 12, fontWeight: "700" },
+                      { color: "rgba(255, 255, 255, 0.8)", fontSize: 14, fontWeight: "700" },
                       isSelected && { color: "#FFFFFF", fontWeight: "900" }
                     ]}>
                       {dayNum}
@@ -503,7 +503,7 @@ export default function BookPtSessionScreen({ navigation }: Props) {
               }}
               onPress={() => setShowBookingDatePicker(false)}
             >
-              <Text style={{ color: "#FFFFFF", fontSize: 13, fontWeight: "800" }}>CLOSE</Text>
+              <Text style={{ color: "#FFFFFF", fontSize: 15, fontWeight: "800" }}>CLOSE</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -574,13 +574,13 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     color: "rgba(255, 255, 255, 0.4)",
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: "700",
     letterSpacing: 1.5,
   },
   sectionTitle: {
     color: "rgba(255, 255, 255, 0.4)",
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: "800",
     letterSpacing: 1.5,
   },
@@ -610,7 +610,7 @@ const styles = StyleSheet.create({
     height: 38,
     paddingHorizontal: 12,
     color: "#FFFFFF",
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: "600",
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.05)",
@@ -632,18 +632,18 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     color: "#FF5E3A",
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: "800",
     letterSpacing: 1,
   },
   summaryValue: {
     color: "#FFFFFF",
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "900",
   },
   summaryTrainer: {
     color: "rgba(255, 255, 255, 0.5)",
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "600",
   },
   selectedPill: {
@@ -656,12 +656,12 @@ const styles = StyleSheet.create({
   },
   selectedText: {
     color: "#4CAF50",
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: "bold",
   },
   selectedSubText: {
     color: "rgba(76, 175, 80, 0.8)",
-    fontSize: 11,
+    fontSize: 13,
     marginTop: 2,
     fontWeight: "600",
   },
@@ -680,7 +680,7 @@ const styles = StyleSheet.create({
   },
   submitBtnText: {
     color: "#FFFFFF",
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "800",
     letterSpacing: 1,
   },

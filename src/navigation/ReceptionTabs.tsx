@@ -47,7 +47,7 @@ export default function ReceptionTabs() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: "#0F0F12",
+    backgroundColor: "#1c1c1fff",
     borderTopWidth: 1,
     borderTopColor: "rgba(255, 255, 255, 0.08)",
     height: Platform.OS === "ios" ? 88 : 68,

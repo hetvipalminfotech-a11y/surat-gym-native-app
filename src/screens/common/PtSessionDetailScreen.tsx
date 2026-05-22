@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   Alert,
   ActivityIndicator,
@@ -19,7 +18,7 @@ import {
   useCompletePtSession,
 } from "../../hooks/usePtSessions";
 import { useAuthStore } from "../../store/useAuthStore";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 type Props = NativeStackScreenProps<RootStackParamList, "PtSessionDetail">;
 
 export default function PtSessionDetailScreen({ route, navigation }: Props) {
@@ -115,7 +114,7 @@ export default function PtSessionDetailScreen({ route, navigation }: Props) {
         >
           <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
             <Ionicons name="chevron-back" size={14} color="#FF5E3A" />
-            <Text style={styles.backButtonText}>BACK</Text>
+
           </View>
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
@@ -206,21 +205,24 @@ export default function PtSessionDetailScreen({ route, navigation }: Props) {
         {session.status === "BOOKED" && (
           <View style={styles.actionSection}>
             <View style={{ gap: 12 }}>
-              <TouchableOpacity
-                style={styles.completeBtn}
-                onPress={handleComplete}
-                disabled={completeMutation.isPending || cancelMutation.isPending}
-                activeOpacity={0.8}
-              >
-                {completeMutation.isPending ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                    <Ionicons name="checkmark-circle" size={18} color="#FFFFFF" />
-                    <Text style={styles.completeBtnText}>COMPLETE SESSION</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
+              {/* Show complete button only for TRAINER */}
+              {isTrainer && (
+                <TouchableOpacity
+                  style={styles.completeBtn}
+                  onPress={handleComplete}
+                  disabled={completeMutation.isPending || cancelMutation.isPending}
+                  activeOpacity={0.8}
+                >
+                  {completeMutation.isPending ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <Ionicons name="checkmark-circle" size={18} color="#FFFFFF" />
+                      <Text style={styles.completeBtnText}>COMPLETE SESSION</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              )}
 
               <TouchableOpacity
                 style={styles.cancelBtn}

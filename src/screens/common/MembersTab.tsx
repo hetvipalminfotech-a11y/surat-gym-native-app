@@ -37,8 +37,8 @@ export default function MembersTab({ navigation }: Props) {
   const [search, setSearch] = useState<string>("");
   const [debouncedSearch, setDebouncedSearch] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
-  const [selectedPlanIds, setSelectedPlanIds] = useState<number[]>([]);
-  const [tempSelectedPlanIds, setTempSelectedPlanIds] = useState<number[]>([]);
+  const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null);
+  const [tempSelectedPlanId, setTempSelectedPlanId] = useState<number | null>(null);
   const [showFilterPlanModal, setShowFilterPlanModal] = useState<boolean>(false);
 
   useEffect(() => {
@@ -54,7 +54,7 @@ export default function MembersTab({ navigation }: Props) {
   const [currentCalendarMonth, setCurrentCalendarMonth] = useState<Date>(new Date());
   const [allPlans, setAllPlans] = useState<MembershipPlan[]>([]);
 
-  const planFilterValue = selectedPlanIds.length > 0 ? selectedPlanIds.join(",") : undefined;
+  const planFilterValue = selectedPlanId ?? undefined;
 
   const {
     data,
@@ -67,26 +67,22 @@ export default function MembersTab({ navigation }: Props) {
 
   const members = data?.pages.flatMap((page) => page.members) ?? [];
 
-  // Plan filter multi-select handlers
+  // Plan filter single-select handlers
   const handleOpenFilterModal = () => {
-    setTempSelectedPlanIds([...selectedPlanIds]);
+    setTempSelectedPlanId(selectedPlanId);
     setShowFilterPlanModal(true);
   };
 
-  const handleToggleTempPlan = (planId: number) => {
-    if (tempSelectedPlanIds.includes(planId)) {
-      setTempSelectedPlanIds(tempSelectedPlanIds.filter((id) => id !== planId));
-    } else {
-      setTempSelectedPlanIds([...tempSelectedPlanIds, planId]);
-    }
+  const handleSelectTempPlan = (planId: number) => {
+    setTempSelectedPlanId((prev) => (prev === planId ? null : planId));
   };
 
-  const handleClearTempPlans = () => {
-    setTempSelectedPlanIds([]);
+  const handleClearTempPlan = () => {
+    setTempSelectedPlanId(null);
   };
 
   const handleApplyFilters = () => {
-    setSelectedPlanIds(tempSelectedPlanIds);
+    setSelectedPlanId(tempSelectedPlanId);
     setShowFilterPlanModal(false);
   };
 
@@ -127,15 +123,17 @@ export default function MembersTab({ navigation }: Props) {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <View style={styles.headerTitleContainer}>
-          <Text style={styles.headerTitle}>Members Directory</Text>
-        </View>
+        <Text style={styles.headerTitle}>Members Directory</Text>
+
         {!isTrainer ? (
-          <TouchableOpacity style={[styles.addButton, { zIndex: 10 }]} onPress={() => navigation.navigate("AddMember")}>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => navigation.navigate("AddMember")}
+          >
             <Text style={styles.addButtonText}>+ ADD NEW</Text>
           </TouchableOpacity>
         ) : (
-          <View />
+          <View style={{ width: 90 }} /> // keeps spacing consistent
         )}
       </View>
 
@@ -155,43 +153,35 @@ export default function MembersTab({ navigation }: Props) {
           <TouchableOpacity
             style={[
               styles.filterIconBtn,
-              selectedPlanIds.length > 0 && styles.filterIconBtnActive,
+              selectedPlanId !== null && styles.filterIconBtnActive,
             ]}
             onPress={handleOpenFilterModal}
             activeOpacity={0.8}
           >
             <Ionicons name="options-outline" size={20} color="#FFFFFF" />
-            {selectedPlanIds.length > 0 && (
-              <View style={styles.filterBadge}>
-                <Text style={styles.filterBadgeText}>{selectedPlanIds.length}</Text>
-              </View>
-            )}
+            {selectedPlanId !== null && <View style={styles.filterBadgeDot} />}
           </TouchableOpacity>
         </View>
 
-        {selectedPlanIds.length > 0 && (
-          <View style={styles.activeFiltersRow}>
-            <Text style={styles.activeFiltersLabel}>Plans: </Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }}>
-              {selectedPlanIds.map((id) => {
-                const plan = allPlans.find((p) => p.id === id);
-                if (!plan) return null;
-                return (
-                  <View key={id} style={styles.activeFilterBadge}>
-                    <Text style={styles.activeFilterBadgeText}>{plan.name}</Text>
-                    <TouchableOpacity
-                      onPress={() => setSelectedPlanIds(selectedPlanIds.filter((pId) => pId !== id))}
-                      style={styles.activeFilterRemoveBtn}
-                      activeOpacity={0.7}
-                    >
-                      <Ionicons name="close" size={12} color="#FF5E3A" />
-                    </TouchableOpacity>
-                  </View>
-                );
-              })}
-            </ScrollView>
-          </View>
-        )}
+        {selectedPlanId !== null && (() => {
+          const plan = allPlans.find((p) => p.id === selectedPlanId);
+          if (!plan) return null;
+          return (
+            <View style={styles.activeFiltersRow}>
+              <Text style={styles.activeFiltersLabel}>Plan: </Text>
+              <View style={styles.activeFilterBadge}>
+                <Text style={styles.activeFilterBadgeText}>{plan.name}</Text>
+                <TouchableOpacity
+                  onPress={() => setSelectedPlanId(null)}
+                  style={styles.activeFilterRemoveBtn}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="close" size={12} color="#FF5E3A" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          );
+        })()}
 
         <View style={styles.tabFilters}>
           <ScrollView
@@ -310,9 +300,9 @@ export default function MembersTab({ navigation }: Props) {
               <Text style={{ color: "#FFFFFF", fontSize: 16, fontWeight: "900", letterSpacing: 0.5 }}>
                 FILTER BY PLAN
               </Text>
-              {tempSelectedPlanIds.length > 0 && (
-                <TouchableOpacity onPress={handleClearTempPlans}>
-                  <Text style={{ color: "#FF5E3A", fontSize: 12, fontWeight: "800" }}>CLEAR ALL</Text>
+              {tempSelectedPlanId !== null && (
+                <TouchableOpacity onPress={handleClearTempPlan}>
+                  <Text style={{ color: "#FF5E3A", fontSize: 12, fontWeight: "800" }}>CLEAR</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -320,7 +310,7 @@ export default function MembersTab({ navigation }: Props) {
             <ScrollView style={{ maxHeight: 300, marginVertical: 8 }} showsVerticalScrollIndicator={false}>
               <View style={{ gap: 10 }}>
                 {allPlans.map((plan) => {
-                  const isSelected = tempSelectedPlanIds.includes(plan.id);
+                  const isSelected = tempSelectedPlanId === plan.id;
                   return (
                     <TouchableOpacity
                       key={plan.id}
@@ -328,7 +318,7 @@ export default function MembersTab({ navigation }: Props) {
                         styles.planFilterRow,
                         isSelected && styles.planFilterRowActive
                       ]}
-                      onPress={() => handleToggleTempPlan(plan.id)}
+                      onPress={() => handleSelectTempPlan(plan.id)}
                       activeOpacity={0.7}
                     >
                       <View>
@@ -340,10 +330,10 @@ export default function MembersTab({ navigation }: Props) {
                         </Text>
                       </View>
                       <View style={[
-                        styles.planFilterCheckbox,
-                        isSelected && styles.planFilterCheckboxActive
+                        styles.planFilterRadio,
+                        isSelected && styles.planFilterRadioActive
                       ]}>
-                        {isSelected && <Ionicons name="checkmark" size={12} color="#000000" />}
+                        {isSelected && <View style={styles.planFilterRadioInner} />}
                       </View>
                     </TouchableOpacity>
                   );
@@ -377,6 +367,34 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#1c1c1fff",
   },
+  // header: {
+  //   flexDirection: "row",
+  //   justifyContent: "space-between",
+  //   alignItems: "center",
+  //   paddingHorizontal: 24,
+  //   paddingVertical: 18,
+  //   borderBottomWidth: 1,
+  //   borderColor: "rgba(255, 255, 255, 0.08)",
+  //   position: "relative",
+  //   minHeight: 68,
+  // },
+  // headerTitleContainer: {
+  //   position: "absolute",
+  //   left: 0,
+  //   right: 0,
+  //   top: 0,
+  //   bottom: 0,
+  //   justifyContent: "center",
+  //   alignItems: "center",
+  //   zIndex: 1,
+  // },
+  // headerTitle: {
+  //   color: "#FFFFFF",
+  //   fontSize: 20,
+  //   fontWeight: "900",
+  //   letterSpacing: 0.5,
+  //   textAlign: "center",
+  // },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -385,25 +403,13 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     borderBottomWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.08)",
-    position: "relative",
     minHeight: 68,
-  },
-  headerTitleContainer: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1,
   },
   headerTitle: {
     color: "#FFFFFF",
     fontSize: 20,
     fontWeight: "900",
     letterSpacing: 0.5,
-    textAlign: "center",
   },
   addButton: {
     backgroundColor: "#FF5E3A",
@@ -1025,6 +1031,17 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: "900",
   },
+  filterBadgeDot: {
+    position: "absolute",
+    top: -2,
+    right: -2,
+    backgroundColor: "#FF5E3A",
+    borderRadius: 5,
+    width: 10,
+    height: 10,
+    borderWidth: 1.5,
+    borderColor: "#1c1c1fff",
+  },
   activeFiltersRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -1105,6 +1122,24 @@ const styles = StyleSheet.create({
     color: "#000000",
     fontSize: 11,
     fontWeight: "900",
+  },
+  planFilterRadio: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 255, 255, 0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  planFilterRadioActive: {
+    borderColor: "#FF5E3A",
+  },
+  planFilterRadioInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#FF5E3A",
   },
   datePickerCloseBtn: {
     backgroundColor: "rgba(255, 255, 255, 0.05)",
