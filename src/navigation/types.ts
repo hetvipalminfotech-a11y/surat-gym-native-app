@@ -1,3 +1,4 @@
+import { NavigatorScreenParams } from "@react-navigation/native";
 import { Member, MemberPtSession } from "../services/receptionist.service";
 
 export type RootStackParamList = {
@@ -5,8 +6,8 @@ export type RootStackParamList = {
   Login: { email?: string } | undefined;
   Register: undefined;
   TrainerHome: undefined;
-  ReceptionTabs: undefined;
-  TrainerTabs: undefined;
+  ReceptionTabs: NavigatorScreenParams<ReceptionTabParamList>;
+  TrainerTabs: NavigatorScreenParams<TrainerTabParamList>;
   MemberDetail: { member: Member; updatedMember?: Member };
   PtSessionDetail: { session: MemberPtSession };
   EditMember: { member: Member };

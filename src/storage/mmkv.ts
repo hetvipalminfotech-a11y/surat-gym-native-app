@@ -63,3 +63,12 @@ export const getUser = (): User | null => {
 export const clearStorage = (): void => {
   storage.clearAll();
 };
+
+export const getDeviceId = (): string => {
+  let deviceId = storage.getString("deviceId");
+  if (!deviceId) {
+    deviceId = "dev-" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    storage.set("deviceId", deviceId);
+  }
+  return deviceId;
+};

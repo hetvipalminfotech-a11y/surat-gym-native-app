@@ -3,12 +3,16 @@ import { LoginResponse, RegisterResponse, ApiResponse, ApiError } from "../types
 
 export const loginUser = async (
   email: string,
-  password: string
+  password: string,
+  deviceId?: string,
+  devicePlatform?: string
 ): Promise<LoginResponse> => {
   try {
     const res = await API.post<ApiResponse<LoginResponse>>("/auth/login", {
       email,
       password,
+      deviceId,
+      devicePlatform,
     });
 
     // Unwrap NestJS global response interceptor data wrapper securely

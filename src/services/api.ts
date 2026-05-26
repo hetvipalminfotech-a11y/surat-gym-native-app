@@ -7,14 +7,14 @@ interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
 
-// const API = axios.create({
-//   baseURL: "http://192.168.29.95:3000/api",
-//   timeout: 10000,
-// });
 const API = axios.create({
-  baseURL: "http://10.0.2.2:3000/api",
+  baseURL: "http://192.168.29.95:3000/api",
   timeout: 10000,
 });
+// const API = axios.create({
+//   baseURL: "http://10.0.2.2:3000/api",
+//   timeout: 10000,
+// });
 // Attach token
 API.interceptors.request.use((config) => {
   const token = getToken();
@@ -44,12 +44,12 @@ API.interceptors.response.use(
       if (refreshToken) {
         try {
           // Perform silent token refresh using a direct axios request to bypass global interceptors
-          // const refreshRes = await axios.post("http://192.168.29.95:3000/api/auth/refresh", {
-          //   refreshToken,
-          // });
-          const refreshRes = await axios.post("http://10.0.2.2:3000/api/auth/refresh", {
+          const refreshRes = await axios.post("http://192.168.29.95:3000/api/auth/refresh", {
             refreshToken,
           });
+          // const refreshRes = await axios.post("http://10.0.2.2:3000/api/auth/refresh", {
+          //   refreshToken,
+          // });
 
           // Unwrap the NestJS data envelopment
           const data = refreshRes.data?.data || refreshRes.data;

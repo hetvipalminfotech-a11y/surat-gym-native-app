@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "626302921342",
+    "project_id": "surat-gym-hub",
+    "storage_bucket": "surat-gym-hub.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:626302921342:android:c8faedfe397fa97358062f",
+        "android_client_info": {
+          "package_name": "com.anonymous.gymnative"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDblicabmArSNyvN7mi-kCoxe9Tez2xjKI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

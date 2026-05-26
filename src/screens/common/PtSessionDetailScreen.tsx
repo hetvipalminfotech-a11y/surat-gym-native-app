@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#1c1c1fff",
-    paddingTop: Platform.OS === "ios" ? 48 : (StatusBar.currentHeight || 24),
+    // paddingTop: Platform.OS === "ios" ? 48 : (StatusBar.currentHeight || 24),
   },
   header: {
     flexDirection: "row",
